@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.frdscm.wms.mapper.InventoryManageMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.frdscm.wms.entity.InventoryManage">
+        <id column="id" property="id"/>
+        <result column="board_number" property="boardNumber"/>
+        <result column="warehouse_storage_number" property="warehouseStorageNumber"/>
+        <result column="warehouse_id" property="warehouseId"/>
+        <result column="warehouse_name" property="warehouseName"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="abnormal" property="abnormal"/>
+        <result column="status" property="status"/>
+        <result column="lock_status" property="lockStatus"/>
+        <result column="batch_number" property="batchNumber"/>
+        <result column="client_id" property="clientId"/>
+        <result column="client_name" property="clientName"/>
+        <result column="warehouse_id" property="warehouseId"/>
+        <result column="single_number" property="singleNumber"/>
+        <result column="material_number" property="materialNumber"/>
+        <result column="material_name" property="materialName"/>
+        <result column="material_specifications" property="materialSpecifications"/>
+        <result column="quantity_count" property="quantityCount"/>
+        <result column="box_count" property="boxCount"/>
+        <result column="gross_weight" property="grossWeight"/>
+        <result column="net_weight" property="netWeight"/>
+        <result column="volume" property="volume"/>
+        <result column="unit_id" property="unitId"/>
+        <result column="unit" property="unit"/>
+        <result column="receipt_time" property="receiptTime"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <collection property="inventoryScanLists" ofType="com.frdscm.wms.entity.InventoryScanList">
+            <id column="is_id" property="id"/>
+            <result column="is_inventory_manage_id" property="inventoryManageId"/>
+            <result column="is_board_number" property="boardNumber"/>
+            <result column="is_box_num" property="boxNum"/>
+            <result column="is_box_son_num" property="boxSonNum"/>
+            <result column="is_box_serial_num" property="boxSerialNum"/>
+            <result column="is_operator_id" property="operatorId"/>
+            <result column="is_operator_name" property="operatorName"/>
+            <result column="is_create_time" property="createTime"/>
+        </collection>
+    </resultMap>
+
+    <select id="freightInquiry" resultType="com.frdscm.wms.entity.InventoryManage">
+        select
+        *
+        from inventory_manage
+        <where>
+            warehouse_id=#{warehouseId} and status != -1
+            <if test="warehouseStorageNumber != null">
+                and warehouse_storage_number = #{warehouseStorageNumber}
+            </if>
+            <if test="materialNumber !=null  ">
+                and material_number = #{materialNumber}
+            </if>
+            <if test="boardNumber != null">
+                and board_number = #{boardNumber}
+            </if>
+        </where>
+    </select>
+
+    <select id="getInventoryManageByPageList" resultMap="BaseResultMap">
+        select im.*,
+        isl.id is_id,
+        isl.board_number is_board_number,
+        isl.box_num is_box_num,
+        isl.box_son_num is_box_son_num,
+        isl.box_serial_num is_box_serial_num,
+        isl.inventory_manage_id is_inventory_manage_id
+        from (select distinct im.*, w.name warehouse_name
+        from inventory_manage im
+        INNER JOIN warehouse w ON im.warehouse_id = w.id
+        <where>
+            im.status >= 0 and im.warehouse_id = #{inventoryManagePageDTO.warehouseId}
+            <if test="inventoryManagePageDTO.clientId != null">
+                and im.client_id = #{inventoryManagePageDTO.clientId}
+            </if>
+            <if test="inventoryManagePageDTO.receiptTimeStart != null and inventoryManagePageDTO.receiptTimeEnd !=null">
+                and im.receipt_time between #{inventoryManagePageDTO.receiptTimeStart} AND
+                DATE_ADD(#{inventoryManagePageDTO.receiptTimeEnd}, INTERVAL 1 DAY)
+            </if>
+            <if test="inventoryManagePageDTO.singleNumber != null">
+                and im.single_number = #{inventoryManagePageDTO.singleNumber}
+            </if>
+            <if test="inventoryManagePageDTO.keywords != null">
+                and (im.board_number like '${inventoryManagePageDTO.keywords}%'
+                or im.warehouse_storage_number like '${inventoryManagePageDTO.keywords}%'
+                or im.material_number like '${inventoryManagePageDTO.keywords}%')
+            </if>
+        </where>
+        order by im.update_time desc
+        LIMIT #{offset}, #{limit}
+        ) im
+        LEFT JOIN inventory_scan_list isl on im.id = isl.inventory_manage_id
+    </select>
+
+    <select id="getInventoryManageByPageCount" resultType="java.lang.Integer">
+        select count(distinct im.id)
+        from inventory_manage im
+        <where>
+            im.status >= 0 and im.warehouse_id = #{warehouseId}
+            <if test="clientId != null">
+                and im.client_id = #{clientId}
+            </if>
+            <if test="receiptTimeStart != null and receiptTimeEnd !=null">
+                and im.receipt_time between #{receiptTimeStart} AND DATE_ADD(#{receiptTimeEnd}, INTERVAL 1 DAY)
+            </if>
+            <if test="singleNumber != null">
+                and im.single_number = #{singleNumber}
+            </if>
+            <if test="keywords != null">
+                and (im.board_number like '${keywords}%'
+                or im.warehouse_storage_number like '${keywords}%'
+                or im.material_number like '${keywords}%')
+            </if>
+        </where>
+    </select>
+
+    <select id="getBatchNumberList" resultType="java.lang.String">
+        select DISTINCT batch_number
+        from inventory_list
+        where client_id = #{clientId}
+          and warehouse_id = #{warehouseId}
+    </select>
+
+    <select id="countBoardNumber" resultType="java.lang.Integer">
+        select ifnull(max(right(t.board_number, 4)), 0) + 1
+        from
+            (
+                select board_number
+                from receipt_list
+                where board_number like '${boardNumberLike}%'
+                Union
+                select board_number
+                from inventory_manage
+                where board_number like '${boardNumberLike}%'
+            ) t
+    </select>
+
+    <select id="getBoardNumberExist" resultType="java.lang.Integer">
+        select count(DISTINCT t.board_number)
+        from
+            (
+                select board_number
+                from receipt_list
+                where board_number = #{boardNumber}
+                union
+                select board_number
+                from inventory_manage
+                where board_number = #{boardNumber}
+            ) t
+    </select>
+
+    <select id="getInventoryManageListByShipment" resultMap="BaseResultMap">
+        select * from inventory_manage
+        <where>
+            warehouse_id = #{warehouseId}
+            <if test="clientId != null">
+                and client_id = #{clientId}
+            </if>
+            <if test="batchNumber !=null">
+                and batch_number = #{batchNumber}
+            </if>
+            <if test="pickTypeId = 188">
+                order by delivery_time desc
+            </if>
+        </where>
+    </select>
+    <select id="getInventoryManageList" resultType="com.frdscm.wms.entity.InventoryManage">
+        SELECT * FROM inventory_manage im
+        <where>
+            im.warehouse_id = #{warehouseId}
+            <if test="clientId != null">
+                and im.client_id = #{clientId}
+            </if>
+            <if test="receiptTimeStart != null and receiptTimeEnd != null">
+                and DATE_FORMAT(receipt_time,'%Y-%m-%d') between #{receiptTimeStart} AND #{receiptTimeEnd}
+            </if>
+            <if test="materialNumber != null">
+                and material_number = #{materialNumber}
+            </if>
+            <if test="abnormal">
+                and abnormal = 1
+            </if>
+        </where>
+    </select>
+
+    <resultMap id="MaterialMap" type="com.frdscm.wms.entity.vo.GetMaterialVO">
+        <result column="material_number" property="materialNumber"/>
+        <result column="material_name" property="materialName"/>
+        <result column="material_specifications" property="materialSpecifications"/>
+        <result column="unit" property="unit"/>
+        <result column="unit_id" property="unitId"/>
+        <result column="unit_type" property="unitType"/>
+        <result column="batch_number" property="batchNumber"/>
+        <result column="quantityCountSum" property="quantityCountSum"/>
+        <result column="boxCountSum" property="boxCountSum"/>
+        <result column="grossWeightSum" property="grossWeightSum"/>
+        <result column="netWeightSum" property="netWeightSum"/>
+        <result column="volumeSum" property="volumeSum"/>
+        <result column="boardCountSum" property="boardCountSum"/>
+        <result column="quantity_scale" property="quantityScale"/>
+        <result column="box_scale" property="boxScale"/>
+        <result column="weight_scale" property="weightScale"/>
+        <result column="volume_scale" property="volumeScale"/>
+        <result column="per_unit_volume" property="perUnitVolume"/>
+        <result column="per_unit_weight" property="perUnitWeight"/>
+        <result column="is_receipt_scan" property="isReceiptScan"/>
+        <result column="is_shipment_scan" property="isShipmentScan"/>
+    </resultMap>
+
+    <select id="getMaterialList" resultMap="MaterialMap">
+        SELECT material_number, MAX(batch_number) batch_number, max(is_receipt_scan) is_receipt_scan,max(is_shipment_scan) is_shipment_scan,
+        material_name,material_specifications,
+        unit,unit_id,unit_type,quantity_scale,box_scale,weight_scale,volume_scale,per_unit_volume,per_unit_weight,
+        SUM(quantity_count) AS quantityCountSum,
+        SUM(box_count) AS boxCountSum,
+        SUM(gross_weight) AS grossWeightSum,
+        SUM(net_weight) AS netWeightSum,
+        SUM(volume) AS volumeSum,
+        count(im.id) AS boardCountSum
+        FROM inventory_manage im
+        <where>
+            im.lock_status = 0 and im.warehouse_id = #{warehouseId}
+            <if test="clientId != null">
+                and im.client_id = #{clientId}
+            </if>
+            <if test="batchNumber !=null">
+                and im.batch_number = #{batchNumber}
+            </if>
+        </where>
+        GROUP BY
+        material_number,material_name,material_specifications,unit,unit_id,unit_type,quantity_scale,box_scale,weight_scale,volume_scale,per_unit_volume,per_unit_weight
+    </select>
+
+    <select id="getFirstIDirstOut" resultType="com.frdscm.wms.entity.InventoryManage">
+        select * from inventory_manage im
+        where lock_status = 0
+        and material_number= #{shipmentCargoDetails.materialNumber}
+        and client_id = #{clientId}
+        and warehouse_id = #{warehouseId}
+        and unit_id = #{shipmentCargoDetails.unitId}
+        and unit = #{shipmentCargoDetails.unit}
+        <!--
+        <if test="shipmentCargoDetails.materialName != null">
+            and material_name = #{shipmentCargoDetails.materialName}
+        </if>
+        <if test="shipmentCargoDetails.materialName != null">
+            and material_specifications = #{shipmentCargoDetails.materialSpecifications}
+        </if>
+        <if test="shipmentCargoDetails.quantityScale != null">
+            and quantity_scale = #{shipmentCargoDetails.quantityScale}
+        </if>
+        <if test="shipmentCargoDetails.boxScale != null">
+            and box_scale = #{shipmentCargoDetails.boxScale}
+        </if>
+        <if test="shipmentCargoDetails.weightScale != null">
+            and weight_scale = #{shipmentCargoDetails.weightScale}
+        </if>
+        <if test="shipmentCargoDetails.volumeScale != null">
+            and volume_scale = #{shipmentCargoDetails.volumeScale}
+        </if>
+        <if test="shipmentCargoDetails.perUnitWeight != null">
+            and per_unit_weight = #{shipmentCargoDetails.perUnitWeight}
+        </if>
+        <if test="shipmentCargoDetails.perUnitVolume != null">
+            and per_unit_volume = #{shipmentCargoDetails.perUnitVolume}
+        </if>
+        -->
+        order by receipt_time asc
+    </select>
+
+    <select id="getInventoryManageByMaterial" resultType="com.frdscm.wms.entity.InventoryManage">
+        select * from inventory_manage where warehouse_id = #{warehouseId} and client_id = #{clientId} and lock_status = 0
+        and material_number in
+        <foreach collection="materialNumbers" index="index" item="item"
+                 open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+</mapper>

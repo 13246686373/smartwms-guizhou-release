@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.frdscm.wms.mapper.CheckListMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.frdscm.wms.entity.CheckList">
+        <id column="id" property="id" />
+        <result column="board_number" property="boardNumber" />
+        <result column="warehouse_storage_number" property="warehouseStorageNumber" />
+        <result column="material_number" property="materialNumber" />
+        <result column="material_name" property="materialName" />
+        <result column="unit" property="unit" />
+        <result column="quantity_count" property="quantityCount" />
+        <result column="box_count" property="boxCount" />
+        <result column="gross_weight" property="grossWeight" />
+        <result column="net_weight" property="netWeight" />
+        <result column="volume" property="volume" />
+        <result column="receipt_time" property="receiptTime" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="client_id" property="clientId" />
+        <result column="client_name" property="clientName" />
+        <result column="check_manage_id" property="checkManageId" />
+        <result column="check_result" property="checkResult" />
+        <result column="check_sum" property="checkSum" />
+        <result column="single_number" property="singleNumber" />
+        <result column="status" property="status" />
+        <result column="unit_id" property="unitId" />
+
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, board_number, warehouse_storage_number, material_number, material_name, unit, quantity_count, box_count, gross_weight, net_weight, volume, receipt_time, create_time, update_time, client_id, client_name,check_manage_id,single_number,status,unitId
+    </sql>
+
+</mapper>

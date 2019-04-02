@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.frdscm.wms.mapper.ShipmentCargoDetailsMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.frdscm.wms.entity.ShipmentCargoDetails">
+        <id column="id" property="id"/>
+        <result column="material_number" property="materialNumber"/>
+        <result column="material_name" property="materialName"/>
+        <result column="material_specifications" property="materialSpecifications"/>
+        <result column="batch_number" property="batchNumber"/>
+        <result column="unit_id" property="unitId"/>
+        <result column="unit" property="unit"/>
+        <result column="shipment_demand_id" property="shipmentDemandId"/>
+        <result column="quantity_count" property="quantityCount"/>
+        <result column="board_count" property="boardCount"/>
+        <result column="box_count" property="boxCount"/>
+        <result column="gross_weight" property="grossWeight"/>
+        <result column="net_weight" property="netWeight"/>
+        <result column="volume" property="volume"/>
+        <result column="actual_box_count" property="actualBoxCount"/>
+        <result column="actual_quantity_count" property="actualQuantityCount"/>
+        <result column="actual_gross_weight" property="actualGrossWeight"/>
+        <result column="actual_net_weight" property="actualNetWeight"/>
+        <result column="actual_volume" property="actualVolume"/>
+        <result column="actual_board_count" property="actualBoardCount"/>
+    </resultMap>
+
+    <select id="getCargoDetailsByMaterialNumber" resultType="com.frdscm.wms.entity.ShipmentCargoDetails">
+        select *
+        from shipment_cargo_details
+        where shipment_demand_id = #{shipmentDemandId}
+        and material_number = #{shipmentList.materialNumber}
+        and unit_id = #{shipmentList.unitId}
+        and unit = #{shipmentList.unit}
+        <!--
+      <if test="shipmentList.materialName != null">
+          and material_name = #{shipmentList.materialName}
+      </if>
+      <if test="shipmentList.materialName != null">
+          and material_specifications = #{shipmentList.materialSpecifications}
+      </if>
+      <if test="shipmentList.quantityScale != null">
+          and quantity_scale = #{shipmentList.quantityScale}
+      </if>
+      <if test="shipmentList.boxScale != null">
+          and box_scale = #{shipmentList.boxScale}
+      </if>
+      <if test="shipmentList.weightScale != null">
+          and weight_scale = #{shipmentList.weightScale}
+      </if>
+      <if test="shipmentList.volumeScale != null">
+          and volume_scale = #{shipmentList.volumeScale}
+      </if>
+      <if test="shipmentList.perUnitWeight != null">
+          and per_unit_weight = #{shipmentList.perUnitWeight}
+      </if>
+      <if test="shipmentList.perUnitVolume != null">
+          and per_unit_volume = #{shipmentList.perUnitVolume}
+      </if>
+      -->
+    </select>
+
+    <select id="getCargoDetailsByMaterialNumbers" resultType="com.frdscm.wms.entity.ShipmentCargoDetails">
+        select *
+        from shipment_cargo_details
+        where shipment_demand_id = #{shipmentDemandId}
+        and material_number = #{shipmentList.materialNumber}
+        and unit_id = #{shipmentList.unitId}
+        and unit = #{shipmentList.unit}
+    </select>
+
+</mapper>

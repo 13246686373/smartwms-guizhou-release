@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.frdscm.wms.mapper.ShipmentScanListMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.frdscm.wms.entity.ShipmentScanList">
+        <id column="id" property="id" />
+        <result column="outgoing_scan_manage_id" property="outgoingScanManageId" />
+        <result column="board_number" property="boardNumber" />
+        <result column="material_number" property="materialNumber" />
+        <result column="box_num" property="boxNum" />
+        <result column="box_son_num" property="boxSonNum" />
+        <result column="box_serial_num" property="boxSerialNum" />
+        <result column="operator_id" property="operatorId" />
+        <result column="operator_name" property="operatorName" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, outgoing_scan_manage_id, board_number, material_number, box_num, box_son_num, box_serial_num,operator_id,operator_name
+    </sql>
+    <resultMap id="OutgoingScan" type="com.frdscm.wms.entity.vo.OutgoingScanVO">
+        <id column="id" property="id" />
+        <result column="single_number" property="singleNumber" />
+        <result column="board_number" property="boardNumber" />
+        <result column="box_num" property="boxNum" />
+        <result column="box_son_num" property="boxSonNum" />
+        <result column="box_serial_num" property="boxSerialNum" />
+        <result column="operator_name" property="operatorName" />
+        <result column="create_time" property="createTime" />
+    </resultMap>
+
+    <select id="getOutgoingScanListList" resultMap="OutgoingScan">
+     SELECT osl.board_number,osl.box_num,osl.box_son_num,osl.box_serial_num,osl.operator_name,osl.create_time,sd.single_number
+        FROM ((outgoing_scan_list osl LEFT JOIN outgoing_scan_manage osm  ON osl.outgoing_scan_manage_id = osm.id) LEFT JOIN shipment_manage  sm ON osm.shipment_manage_id = sm.id)
+        LEFT JOIN shipment_demand sd ON sm.shipment_demand_id = sd.id
+         where osm.shipment_manage_id = #{shipmentManageId}
+    </select>
+    <!--<select id="getOutgoingScanManageList" resultMap="BaseResultMapApp">-->
+        <!--select sd.single_number as singleNumber,osm.*  from  outgoing_scan_manage osm left  join shipment_demand sd on osm.shipment_manage_id = sd.id-->
+          <!--where-->
+
+    <!--</select>-->
+
+</mapper>

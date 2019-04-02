@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.frdscm.wms.mapper.ReceiptCargoDetailsMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.frdscm.wms.entity.ReceiptCargoDetails">
+        <id column="id" property="id"/>
+        <result column="material_number" property="materialNumber"/>
+        <result column="material_name" property="materialName"/>
+        <result column="material_specifications" property="materialSpecifications"/>
+        <result column="board_count" property="boardCount"/>
+        <result column="box_count" property="boxCount"/>
+        <result column="quantity_count" property="quantityCount"/>
+        <result column="gross_weight" property="grossWeight"/>
+        <result column="net_weight" property="netWeight"/>
+        <result column="volume" property="volume"/>
+        <result column="receipt_demand_id" property="receiptDemandId"/>
+        <result column="batch_number" property="batchNumber"/>
+        <result column="unit" property="unit"/>
+        <result column="unitId" property="unitId"/>
+    </resultMap>
+
+    <select id="getCargoDetailsByMaterialNumber" resultType="com.frdscm.wms.entity.ReceiptCargoDetails">
+        select *
+        from receipt_cargo_details
+        where receipt_demand_id = #{receiptDemandId}
+        and material_number = #{receiptList.materialNumber}
+        and unit_id = #{receiptList.unitId}
+        and unit = #{receiptList.unit}
+          <!--
+        <if test="receiptList.materialName != null">
+            and material_name = #{receiptList.materialName}
+        </if>
+        <if test="receiptList.materialName != null">
+            and material_specifications = #{receiptList.materialSpecifications}
+        </if>
+        <if test="receiptList.quantityScale != null">
+            and quantity_scale = #{receiptList.quantityScale}
+        </if>
+        <if test="receiptList.boxScale != null">
+            and box_scale = #{receiptList.boxScale}
+        </if>
+        <if test="receiptList.weightScale != null">
+            and weight_scale = #{receiptList.weightScale}
+        </if>
+        <if test="receiptList.volumeScale != null">
+            and volume_scale = #{receiptList.volumeScale}
+        </if>
+        <if test="receiptList.perUnitWeight != null">
+            and per_unit_weight = #{receiptList.perUnitWeight}
+        </if>
+        <if test="receiptList.perUnitVolume != null">
+            and per_unit_volume = #{receiptList.perUnitVolume}
+        </if>
+        -->
+    </select>
+</mapper>

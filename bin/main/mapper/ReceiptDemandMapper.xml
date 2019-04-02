@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.frdscm.wms.mapper.ReceiptDemandMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.frdscm.wms.entity.ReceiptDemand">
+        <id column="id" property="id"/>
+        <result column="single_number" property="singleNumber"/>
+        <result column="client_id" property="clientId"/>
+        <result column="client_name" property="clientName"/>
+        <result column="warehouse_id" property="warehouseId"/>
+        <result column="type_id" property="typeId"/>
+        <result column="type_name" property="typeName"/>
+        <result column="mode_id" property="modeId"/>
+        <result column="mode_name" property="modeName"/>
+        <result column="project_id" property="projectId"/>
+        <result column="project_name" property="projectName"/>
+        <result column="source_id" property="sourceId"/>
+        <result column="source_name" property="sourceName"/>
+        <result column="order_number" property="orderNumber"/>
+        <result column="waybill_number" property="waybillNumber"/>
+        <result column="expected_time" property="expectedTime"/>
+        <result column="operating_mode_id" property="operatingModeId"/>
+        <result column="operating_mode_name" property="operatingModeName"/>
+        <result column="remark" property="remark"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="operator_id" property="operatorId"/>
+        <result column="operator_name" property="operatorName"/>
+        <result column="status" property="status"/>
+        <collection property="receiptCargoDetailsList" column="id" select="getReceiptCargoDetails"/>
+    </resultMap>
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMapPage" type="com.frdscm.wms.entity.vo.ReceiptDemandVO">
+        <id column="id" property="id"/>
+        <result column="single_number" property="singleNumber"/>
+        <result column="client_id" property="clientId"/>
+        <result column="client_name" property="clientName"/>
+        <result column="warehouse_id" property="warehouseId"/>
+        <result column="warehouseName" property="warehouseName"/>
+        <result column="type_id" property="typeId"/>
+        <result column="type_name" property="typeName"/>
+        <result column="mode_id" property="modeId"/>
+        <result column="mode_name" property="modeName"/>
+        <result column="project_id" property="projectId"/>
+        <result column="project_name" property="projectName"/>
+        <result column="source_id" property="sourceId"/>
+        <result column="source_name" property="sourceName"/>
+        <result column="order_number" property="orderNumber"/>
+        <result column="waybill_number" property="waybillNumber"/>
+        <result column="expected_time" property="expectedTime"/>
+        <result column="operating_mode_id" property="operatingModeId"/>
+        <result column="operating_mode_name" property="operatingModeName"/>
+        <result column="remark" property="remark"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="operator_id" property="operatorId"/>
+        <result column="operator_name" property="operatorName"/>
+        <result column="status" property="status"/>
+        <result column="statusName" property="statusName"/>
+        <collection property="receiptCargoDetailsList" column="id" select="getReceiptCargoDetails"/>
+    </resultMap>
+    <select id="getReceiptCargoDetailsList" resultMap="BaseResultMapPage">
+        SELECT
+        r.*,
+        w.name AS warehouseName,
+        (CASE
+        WHEN r.status = 1 THEN '未确认'
+        WHEN r.status = 2 THEN '已确认'
+        ELSE '已删除'
+        END) AS statusName
+        FROM receipt_demand r left join warehouse w ON r.warehouse_id = w.id
+        <where>
+            1=1
+            <if test="typeId != null">
+                and r.type_id =#{typeId}
+            </if>
+
+            <if test="clientId != null">
+                and r.client_id = #{clientId}
+            </if>
+
+            <if test="sourceId != null">
+                and r.source_id = #{sourceId}
+            </if>
+
+            <if test="warehouseId != null">
+                and r.warehouse_id = #{warehouseId}
+            </if>
+
+            <if test="operatingModeId != null">
+                and r.operating_mode_id =#{operatingModeId}
+            </if>
+
+            <if test="keywords != null">
+                and r.single_number like '%${keywords}%'
+            </if>
+            order by r.create_time desc, r.status
+        </where>
+    </select>
+
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="ReceiptManageMap" type="com.frdscm.wms.entity.vo.ReceiptDemandAppVO">
+        <id column="id" property="receiptManageId"/>
+        <result column="single_number" property="singleNumber"/>
+        <result column="client_id" property="clientId"/>
+        <result column="client_name" property="clientName"/>
+        <result column="order_number" property="orderNumber"/>
+        <result column="waybill_number" property="waybillNumber"/>
+        <result column="status" property="status"/>
+        <result column="is_measure_receipt" property="isMeasureReceipt"/>
+        <result column="is_box_count" property="isBoxCount"/>
+        <result column="is_quantity_count" property="isQuantityCount"/>
+        <result column="is_weight_receipt" property="isWeightReceipt"/>
+        <result column="is_gross_weight" property="isGrossWeight"/>
+        <result column="is_net_weight" property="isNetWeight"/>
+        <result column="is_volume_receipt" property="isVolumeReceipt"/>
+        <result column="is_batch_receipt" property="isBatchReceipt"/>
+        <result column="is_batch_receipt" property="isBatchReceipt"/>
+
+    </resultMap>
+    <select id="getReceipetManageByApp" resultMap="ReceiptManageMap">
+       select
+       rd.single_number,rd.client_id,rd.client_name,rd.order_number,rd.waybill_number,
+       rm.*
+       from
+        receipt_manage rm INNER  join receipt_demand rd
+       ON rm.receipt_demand_id = rd.id
+        where rm.status in (1, 3) and  rd.status=2 and warehouse_id = #{warehouseId}
+    </select>
+
+    <select id="getReceipetManageByShelf" resultMap="ReceiptManageMap">
+       select
+       rd.single_number,rd.client_id,rd.client_name,rd.order_number,rd.waybill_number,
+       rm.*
+       from
+        receipt_manage rm INNER  join receipt_demand rd
+       ON rm.receipt_demand_id = rd.id
+        where rm.status = 4 and  rd.status= 2 and warehouse_id = #{warehouseId}
+    </select>
+
+    <select id="getReceiptCargoDetails" resultType="com.frdscm.wms.entity.ReceiptCargoDetails">
+        select * FROM receipt_cargo_details
+        where receipt_demand_id=#{id}
+    </select>
+</mapper>

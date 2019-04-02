@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.frdscm.wms.mapper.ReceiptManageMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.frdscm.wms.entity.ReceiptManage">
+        <id column="id" property="id"/>
+        <result column="receipt_demand_id" property="receiptDemandId"/>
+        <result column="status" property="status"/>
+    </resultMap>
+
+    <!--<resultMap type="java.util.Map" id="selectReceiptManageByPageListResult">-->
+    <!--<result column="single_number" property="singleNumber"/>-->
+    <!--<result column="client_id" property="clientId"/>-->
+    <!--<result column="client_name" property="clientName"/>-->
+    <!--<result column="receiptManageId" property="receiptManageId"/>-->
+    <!--<result column="warehouse_id" property="warehouseId"/>-->
+    <!--<result column="name" property="name"/>-->
+    <!--<result column="operating_mode_id" property="operatingModeId"/>-->
+    <!--<result column="operating_mode_name" property="operatingModeName"/>-->
+    <!--<result column="receiptManageStatus" property="receiptManageStatus"/>-->
+    <!--<result column="project_id" property="projectId"/>-->
+    <!--<result column="project_name" property="projectName"/>-->
+    <!--<result column="expected_time" property="expectedTime"/>-->
+    <!--</resultMap>-->
+    <select id="getReceiptManageByPageList" resultType="java.util.Map">
+        SELECT rd.single_number singleNumber,rd.client_id clientId,rd.client_name clientName,rm.id AS receiptManageId
+        ,rd.warehouse_id warehouseId
+        ,w.name,rd.operating_mode_id operatingModeId,rd.operating_mode_name operatingModeName,rm.status as
+        receiptManageStatus,rd.expected_time expectedTime,
+        rd.project_id projectId,rd.project_name projectName
+        FROM receipt_manage rm LEFT JOIN receipt_demand rd ON rm.receipt_demand_id = rd.id LEFT JOIN warehouse w ON
+        rd.warehouse_id = w.id
+        <where>
+            rd.status = 2
+            <if test="singleNumber != null">
+                and rd.single_number like '${singleNumber}%'
+            </if>
+            <if test="clientId != null">
+                and rd.client_id = #{clientId}
+            </if>
+            <if test="warehouseFilters != null and warehouseFilters.size()>0">
+                and rd.warehouse_id in
+                <foreach collection="warehouseFilters" index="index" item="item"
+                         open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="receiptManageStatusFilters != null and receiptManageStatusFilters.size()>0">
+                and rm.status in
+                <foreach collection="receiptManageStatusFilters" index="index" item="item"
+                         open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        order by rd.update_time desc
+    </select>
+
+
+    <resultMap id="ReceiptCount" type="com.frdscm.wms.entity.vo.ReceiptCountVO">
+        <result column="client_name" property="clientName"/>
+        <result column="client_id" property="clientId"/>
+        <result column="toBeConfirmed" property="toBeConfirmed"/>
+        <result column="toBeReceived" property="toBeReceived"/>
+        <result column="InReceiptOfGoods" property="inReceiptOfGoods"/>
+        <result column="toBePendingStorage" property="toBePendingStorage"/>
+    </resultMap>
+    <select id="getReceiptDataCount" resultMap="ReceiptCount">
+        SELECT
+        rd.client_name,
+        rd.client_id,
+        SUM(IF(rd.`status` = 1,1,0)) AS toBeConfirmed,
+        SUM(IF(rm.`status` = 1,1,0)) AS toBeReceived,
+        SUM(IF(rm.`status` = 3,1,0)) AS inReceiptOfGoods,
+        SUM(IF(rm.`status` = 4,1,0)) AS toBePendingStorage
+        FROM receipt_demand rd LEFT JOIN receipt_manage rm ON rm.`receipt_demand_id` = rd.`id`
+        <where>
+            1=1
+            <if test="warehouseId != null">
+                and warehouse_id = #{warehouseId}
+            </if>
+            <if test="clientId != null">
+                and rd.client_id = #{clientId}
+            </if>
+            <if test="receiptTimeStart != null and receiptTimeEnd !=null">
+                and UNIX_TIMESTAMP(rd.create_time)*1000 between #{receiptTimeStart} AND #{receiptTimeEnd}
+            </if>
+        </where>
+        GROUP BY rd.client_id,rd.client_name
+    </select>
+
+    <select id="getReceiptBoardCount" resultType="java.util.Map">
+        SELECT
+        ifnull(SUM(IF(rd.`status` = 1,1,0)),0) AS toBeConfirmed,
+        ifnull(SUM(IF(rm.`status` = 1,1,0)),0) AS toBeReceived,
+        ifnull(SUM(IF(rm.`status` = 3,1,0)),0) AS inReceiptOfGoods,
+        ifnull(SUM(IF(rm.`status` = 4,1,0)),0) AS toBePendingStorage,
+        ifnull(SUM(IF(rm.`status` = 2,1,0)),0) AS received
+        FROM receipt_demand rd LEFT JOIN receipt_manage rm ON rm.`receipt_demand_id` = rd.`id`
+        <where>
+            1=1
+            <if test="warehouseId != null">
+                and warehouse_id = #{warehouseId}
+            </if>
+            <if test="clientId != null">
+                and rd.client_id = #{clientId}
+            </if>
+            <if test="receiptTimeStart != null and receiptTimeEnd !=null">
+                and UNIX_TIMESTAMP(rd.create_time)*1000 between #{receiptTimeStart} AND #{receiptTimeEnd}
+            </if>
+        </where>
+    </select>
+
+    <select id="getReceiptDateCount" resultType="java.util.Map">
+        SELECT DATE_FORMAT(create_time,'%Y-%m-%d') AS date ,SUM(1) AS orderCount FROM receipt_demand
+        <where>
+            1=1
+            <if test="warehouseId != null">
+                and warehouse_id = #{warehouseId}
+            </if>
+            <if test="clientId != null">
+                and client_id = #{clientId}
+            </if>
+            <if test="receiptTimeStart != null and receiptTimeEnd !=null">
+                and UNIX_TIMESTAMP(create_time)*1000 between #{receiptTimeStart} AND #{receiptTimeEnd}
+            </if>
+        </where>
+        GROUP BY DATE_FORMAT(create_time,'%Y-%m-%d')
+
+    </select>
+
+</mapper>

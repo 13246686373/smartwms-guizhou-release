@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.frdscm.wms.mapper.ShipmentManageMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.frdscm.wms.entity.ShipmentManage">
+        <id column="id" property="id"/>
+        <result column="shipment_demand_id" property="shipmentDemandId"/>
+        <result column="status" property="status"/>
+        <result column="remove" property="remove"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, shipment_demand_id, status, remove, create_time
+    </sql>
+
+    <resultMap id="ShipmentManageResult" type="com.frdscm.wms.entity.vo.ShipmentManageListVO">
+        <result column="id" property="id"/>
+        <result column="single_number" property="singleNumber"/>
+        <result column="client_name" property="clientName"/>
+        <result column="name" property="wareHouseName"/>
+        <result column="pick_type_name" property="pickTypeName"/>
+        <result column="delivery_time" property="deliveryTime"/>
+        <result column="status" property="status"/>
+        <result column="statusName" property="statusName"/>
+    </resultMap>
+
+    <select id="getShipmentManageByPageList" resultType="java.util.Map">
+        SELECT
+        sd.single_number singleNumber,sd.client_id clientId,sd.client_name clientName,sm.id AS shipmentManageId
+        ,sd.warehouse_id warehouseId
+        ,w.name,sm.status as
+        shipmentManageStatus,sd.delivery_time deliveryTime,
+        sd.pick_type_name pickTypeName,
+        sd.project_id projectId,sd.project_name projectName
+        FROM shipment_manage sm LEFT JOIN shipment_demand sd ON sm.shipment_demand_id = sd.id LEFT JOIN warehouse w
+        ON sd.warehouse_id = w.id
+        <where>
+            sd.status = 2
+            <if test="singleNumber != null">
+                and sd.single_number like '${singleNumber}%'
+            </if>
+
+            <if test="warehouseFilters != null and warehouseFilters.size()>0">
+                and sd.warehouse_id in
+                <foreach collection="warehouseFilters" index="index" item="item"
+                         open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="shipmentManageStatusFilters != null and shipmentManageStatusFilters.size()>0">
+                and sm.status in
+                <foreach collection="shipmentManageStatusFilters" index="index" item="item"
+                         open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="clientId != null">
+                and sd.client_id = #{clientId}
+            </if>
+        </where>
+        order by sd.delivery_time desc
+    </select>
+
+
+    <resultMap id="ShipmentsCount" type="com.frdscm.wms.entity.vo.ShipmentsCountVO">
+        <result column="client_name" property="clientName"/>
+        <result column="client_id" property="clientId"/>
+        <result column="toBeConfirmed" property="toBeConfirmed"/>
+        <result column="toBeShipments" property="toBeShipments"/>
+        <result column="inShipmentsOfGoods" property="inShipmentsOfGoods"/>
+        <result column="toBeShipped" property="toBeShipped"/>
+    </resultMap>
+    <select id="getShipmentBoardCount" resultType="java.util.Map">
+        SELECT
+        ifnull(SUM(IF(sd.`status` = 1,1,0)),0) AS toBeConfirmed,
+        ifnull(SUM(IF(sm.`status` = 1,1,0)),0) AS toBeShipments,
+        ifnull(SUM(IF(sm.`status` = 4,1,0)),0) AS inShipmentsOfGoods,
+        ifnull(SUM(IF(sm.`status` = 2,1,0)),0) AS toBeShipped,
+        ifnull(SUM(IF(sm.`status` = 3,1,0)),0) AS shipped
+        FROM `shipment_demand` sd LEFT JOIN  `shipment_manage` sm  ON sd.id = sm.shipment_demand_id
+        <where>
+            1=1
+            <if test="warehouseId != null">
+            and warehouse_id = #{warehouseId}
+            </if>
+            <if test="clientId != null">
+                and sd.client_id = #{clientId}
+            </if>
+            <if test="receiptTimeStart != null and receiptTimeEnd !=null">
+                and UNIX_TIMESTAMP(sd.create_time)*1000 between #{receiptTimeStart} AND #{receiptTimeEnd}
+            </if>
+        </where>
+    </select>
+
+
+    <select id="getShipmentDataCount" resultMap="ShipmentsCount">
+        SELECT
+        sd.client_name,
+        sd.client_id,
+        SUM(IF(sd.`status` = 1,1,0)) AS toBeConfirmed,
+        SUM(IF(sm.`status` = 1,1,0)) AS toBeShipments,
+        SUM(IF(sm.`status` = 4,1,0)) AS inShipmentsOfGoods,
+        SUM(IF(sm.`status` = 2,1,0)) AS toBeShipped
+        FROM `shipment_demand` sd LEFT JOIN  `shipment_manage` sm  ON sd.id = sm.shipment_demand_id
+        <where>
+            1=1
+            <if test="warehouseId != null">
+                and warehouse_id = #{warehouseId}
+            </if>
+            <if test="clientId != null">
+                and sd.client_id = #{clientId}
+            </if>
+            <if test="receiptTimeStart != null and receiptTimeEnd !=null">
+                and UNIX_TIMESTAMP(sd.create_time)*1000 between #{receiptTimeStart} AND #{receiptTimeEnd}
+            </if>
+        </where>
+        GROUP BY sd.client_id,sd.client_name
+    </select>
+
+
+    <select id="getShipmentDateCount" resultType="java.util.Map">
+        SELECT  DATE_FORMAT(create_time,'%Y-%m-%d') AS date ,SUM(1) AS orderCount FROM shipment_demand
+        <where>
+            1=1
+            <if test="warehouseId != null">
+                and warehouse_id = #{warehouseId}
+            </if>
+            <if test="clientId != null">
+                and client_id = #{clientId}
+            </if>
+            <if test="receiptTimeStart != null and receiptTimeEnd !=null">
+                and UNIX_TIMESTAMP(create_time)*1000 between #{receiptTimeStart} AND #{receiptTimeEnd}
+            </if>
+        </where>
+        GROUP BY DATE_FORMAT(create_time,'%Y-%m-%d')
+
+    </select>
+</mapper>

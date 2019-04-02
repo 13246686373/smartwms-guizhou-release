@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.frdscm.wms.mapper.InventoryListMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.frdscm.wms.entity.InventoryList">
+        <id column="id" property="id"/>
+        <result column="batch_number" property="batchNumber"/>
+        <result column="client_id" property="clientId"/>
+        <result column="client_name" property="clientName"/>
+        <result column="warehouse_id" property="warehouseId"/>
+        <result column="single_number" property="singleNumber"/>
+        <result column="material_number" property="materialNumber"/>
+        <result column="material_name" property="materialName"/>
+        <result column="material_specifications" property="materialSpecifications"/>
+        <result column="quantity_count" property="quantityCount"/>
+        <result column="box_count" property="boxCount"/>
+        <result column="gross_weight" property="grossWeight"/>
+        <result column="net_weight" property="netWeight"/>
+        <result column="volume" property="volume"/>
+        <result column="unit" property="unit"/>
+        <result column="receipt_time" property="receiptTime"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="abnormal" property="abnormal"/>
+        <result column="unit_id" property="unitId"/>
+        <result column="available_stock" property="availableStock"/>
+        <result column="lock_stock" property="lockStock"/>
+        <result column="inventory_manage_id" property="inventoryManageId"/>
+    </resultMap>
+
+
+</mapper>

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.frdscm.wms.mapper.ShipmentDemandMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.frdscm.wms.entity.ShipmentDemand">
+        <id column="id" property="id"/>
+        <result column="single_number" property="singleNumber"/>
+        <result column="client_id" property="clientId"/>
+        <result column="client_name" property="clientName"/>
+        <result column="warehouse_id" property="warehouseId"/>
+        <result column="type_id" property="typeId"/>
+        <result column="type_name" property="typeName"/>
+        <result column="source_id" property="sourceId"/>
+        <result column="source_name" property="sourceName"/>
+        <result column="source_number" property="sourceNumber"/>
+        <result column="delivery_time" property="deliveryTime"/>
+        <result column="pick_type_id" property="pickTypeId"/>
+        <result column="pick_type_name" property="pickTypeName"/>
+        <result column="shipment_method_id" property="shipmentMethodId"/>
+        <result column="shipment_method_name" property="shipmentMethodName"/>
+        <result column="phone" property="phone"/>
+        <result column="cargo_party_id" property="cargoPartyId"/>
+        <result column="cargo_party_name" property="cargoPartyName"/>
+        <result column="contacts" property="contacts"/>
+        <result column="area_name" property="areaName"/>
+        <result column="receipt_address" property="receiptAddress"/>
+        <result column="remark" property="remark"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="operator_id" property="operatorId"/>
+        <result column="operator_name" property="operatorName"/>
+        <result column="status" property="status"/>
+        <result column="project_id" property="projectId"/>
+        <result column="project_name" property="projectName"/>
+        <result column="warehouse_name" property="warehouseName"/>
+    </resultMap>
+
+    <resultMap id="BaseResultMapPage" type="com.frdscm.wms.entity.vo.ShipmentDemandVO">
+        <id column="id" property="id"/>
+        <result column="single_number" property="singleNumber"/>
+        <result column="client_id" property="clientId"/>
+        <result column="client_name" property="clientName"/>
+        <result column="warehouse_id" property="warehouseId"/>
+        <result column="type_id" property="typeId"/>
+        <result column="type_name" property="typeName"/>
+        <result column="source_id" property="sourceId"/>
+        <result column="source_name" property="sourceName"/>
+        <result column="source_number" property="sourceNumber"/>
+        <result column="delivery_time" property="deliveryTime"/>
+        <result column="pick_type_id" property="pickTypeId"/>
+        <result column="pick_type_name" property="pickTypeName"/>
+        <result column="shipment_method_id" property="shipmentMethodId"/>
+        <result column="shipment_method_name" property="shipmentMethodName"/>
+        <result column="cargo_party_id" property="cargoPartyId"/>
+        <result column="cargo_party_name" property="cargoPartyName"/>
+        <result column="contacts" property="contacts"/>
+        <result column="area_name" property="areaName"/>
+        <result column="phone" property="phone"/>
+        <result column="consignee_id" property="consigneeId"/>
+        <result column="consignee_name" property="consigneeName"/>
+        <result column="receipt_address" property="receiptAddress"/>
+        <result column="remark" property="remark"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="operator_id" property="operatorId"/>
+        <result column="operator_name" property="operatorName"/>
+        <result column="status" property="status"/>
+        <result column="statusName" property="statusName"/>
+        <result column="warehouseName" property="warehouseName"/>
+        <collection property="shipmentCargoDetailsList" column="id" select="getShipmentCargoDetails"/>
+    </resultMap>
+
+    <select id="getShipmentDemandByPageList" resultMap="BaseResultMapPage">
+        SELECT
+        sd.*,
+        (CASE
+        WHEN sd.status = 1 THEN '未确认'
+        WHEN sd.status = 2 THEN '已确认'
+        ELSE '已删除'
+        END ) AS statusName,
+        w.name as warehouseName
+          from  shipment_demand sd left join  warehouse w
+          on sd.warehouse_id = w.id
+        <where>
+            1=1 and sd.status !=-1
+            <if test="clientId != null">
+                and sd.client_id = #{clientId}
+            </if>
+            <if test="warehouseId != null">
+                and sd.warehouse_id =  #{warehouseId}
+            </if>
+            <if test="typeId != null">
+                and sd.type_id =  #{typeId}
+            </if>
+            <if test="sourceId != null">
+                and sd.source_id =  #{sourceId}
+            </if>
+            <if test="shipmentMethodId != null">
+                and sd.shipment_method_id = #{shipmentMethodId}
+            </if>
+            <if test="keywords != null">
+                and sd.single_number like   '%${keywords}%'
+            </if>
+
+        </where>
+        order by sd.create_time desc, sd.status
+    </select>
+
+
+    <select id="getShipmentCargoDetails" resultType="com.frdscm.wms.entity.ShipmentCargoDetails">
+        select * FROM shipment_cargo_details
+        where shipment_demand_id=#{id}
+    </select>
+
+</mapper>

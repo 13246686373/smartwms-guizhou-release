@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.frdscm.wms.mapper.ShipmentItemListMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.frdscm.wms.entity.ShipmentItemList">
+        <id column="id" property="id"/>
+        <result column="batch_number" property="batchNumber"/>
+        <result column="material_number" property="materialNumber"/>
+        <result column="material_name" property="materialName"/>
+        <result column="material_specifications" property="materialSpecifications"/>
+        <result column="box_count" property="boxCount"/>
+        <result column="quantity_count" property="quantityCount"/>
+        <result column="gross_weight" property="grossWeight"/>
+        <result column="net_weight" property="netWeight"/>
+        <result column="board_count" property="boardCount"/>
+        <result column="volume" property="volume"/>
+        <result column="unit" property="unit"/>
+        <result column="unit_id" property="unitId"/>
+        <result column="shipmentList_id" property="shipmentListId"/>
+    </resultMap>
+
+</mapper>

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.frdscm.wms.mapper.CheckManageMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.frdscm.wms.entity.CheckManage">
+        <id column="id" property="id"/>
+        <result column="check_type_id" property="checkTypeId"/>
+        <result column="check_type_name" property="checkTypeName"/>
+        <result column="warehouse_id" property="warehouseId"/>
+        <result column="check_number" property="checkNumber"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="status" property="status"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,check_type_id,check_type_name,warehouse_id,check_number,create_time,update_time,status
+    </sql>
+
+    <resultMap id="BaseResultMapPage" type="com.frdscm.wms.entity.vo.CheckManageVO">
+        <id column="id" property="id"/>
+        <result column="warehouse_id" property="warehouseId"/>
+        <result column="warehouse_name" property="warehouseName"/>
+        <result column="check_number" property="checkNumber"/>
+        <result column="check_type_id" property="checkTypeId"/>
+        <result column="check_type_name" property="checkTypeName"/>
+        <result column="status" property="status"/>
+        <result column="client_id" property="clientId"/>
+        <result column="client_name" property="clientName"/>
+        <result column="file_name" property="fileName"/>
+        <result column="file_path" property="filePath"/>
+        <result column="material_name" property="materialName"/>
+        <result column="material_Number" property="materialNumber"/>
+        <result column="receipt_time_start" property="receiptTimeStart"/>
+        <result column="receipt_time_end" property="receiptTimeEnd"/>
+    </resultMap>
+
+    <select id="selectCheckPage" resultMap="BaseResultMapPage">
+        select cm.*,w.name as warehouse_name
+        ,cm.status from check_manage cm inner join warehouse w on cm.warehouse_id = w.id
+        <where>
+            1 = 1
+            <if test="warehouseFilters != null and warehouseFilters.size()>0">
+                and cm.warehouse_id in
+                <foreach collection="warehouseFilters" index="index" item="item"
+                         open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="checkManageStatusFilters != null and checkManageStatusFilters.size()>0">
+                and cm.status in
+                <foreach collection="checkManageStatusFilters" index="index" item="item"
+                         open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="checkTypeFilters != null and checkTypeFilters.size()>0">
+                and cm.check_type_id in
+                <foreach collection="checkTypeFilters" index="index" item="item"
+                         open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+</mapper>

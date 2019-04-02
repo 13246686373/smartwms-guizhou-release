@@ -1,0 +1,146 @@
+package com.frdscm.wms.entity.vo;
+
+import com.frdscm.wms.entity.ShipmentCargoDetails;
+import lombok.Data;
+
+import java.io.Serializable;
+import java.util.Date;
+import java.util.List;
+
+/**
+ * 收货需求表
+ *
+ * @author dizhang
+ * @since 2018-07-03
+ */
+@Data
+public class ShipmentDemandVO implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    private Integer id;
+    /**
+     * 出货单号
+     */
+    private String singleNumber;
+    /**
+     * 客户ID
+     */
+    private Integer clientId;
+    /**
+     * 客户名称
+     */
+    private String clientName;
+    /**
+     * 出货仓库ID
+     */
+    private Integer warehouseId;
+    /**
+     * 出货仓库名称
+     */
+    private String warehouseName;
+    /**
+     * 出货类型ID
+     */
+    private Integer typeId;
+    /**
+     * 出货类型名称
+     */
+    private String typeName;
+    /**
+     * 需求来源ID
+     */
+    private Integer sourceId;
+    /**
+     * 需求来源名称
+     */
+    private String sourceName;
+    /**
+     * 来源单号
+     */
+    private String sourceNumber;
+    /**
+     * 交货日期
+     */
+    private Date deliveryTime;
+    /**
+     * 拣货要求ID
+     */
+    private Integer pickTypeId;
+
+    private String consigneeName;
+
+    private String consigneeId;
+    /**
+     * 拣货要求名称
+     */
+    private String pickTypeName;
+    /**
+     * 出货方式ID
+     */
+    private Integer shipmentMethodId;
+    /**
+     * 出货方式名称
+     */
+    private String shipmentMethodName;
+    /**
+     * 联系方式
+     */
+    private String phone;
+    /**
+     * 收货方ID
+     */
+    private Integer cargoPartyId;
+    /**
+     * 收货方(代码)
+     */
+    private String cargoPartyName;
+    /**
+     * 联系人
+     */
+    private String contacts;
+    /**
+     * 收货地址
+     */
+    private String receiptAddress;
+    /**
+     * 所属片区
+     */
+    private String areaName;
+    /**
+     * 备注
+     */
+    private String remark;
+    /**
+     * 创建时间
+     */
+    private Date createTime;
+    /**
+     * 更新时间
+     */
+    private Date updateTime;
+    /**
+     * 操作人ID
+     */
+    private Integer operatorId;
+    /**
+     * 操作人
+     */
+    private String operatorName;
+    /**
+     * 状态 -1-删除 1-未确认 2-已确认
+     */
+    private Integer status;
+
+    private String statusName;
+    /**
+     * 关联项目ID
+     */
+    private Integer projectId;
+    /**
+     * 关联项目名称
+     */
+    private String projectName;
+
+    private List<ShipmentCargoDetails> shipmentCargoDetailsList;
+}
