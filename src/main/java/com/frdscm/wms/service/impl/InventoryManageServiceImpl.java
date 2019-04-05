@@ -230,7 +230,7 @@ public class InventoryManageServiceImpl extends ServiceImpl<InventoryManageMappe
         inventoryManage.setAbnormal(1);
         inventoryManageMapper.updateById(inventoryManage);
         inventoryManage.setCreateTime(new Date());
-        inventoryManageMapper.addInventoryReportManage(inventoryManage);
+        inventoryManageMapper.addInventoryReportManage("inventory_manage_displacement",inventoryManage);
     }
 
     @Override
@@ -261,7 +261,7 @@ public class InventoryManageServiceImpl extends ServiceImpl<InventoryManageMappe
         inventoryManageMapper.updateById(inventoryManage);
         Date date = new Date();
         inventoryManage.setCreateTime(date);
-        inventoryManageMapper.addInventoryReportManage(inventoryManage);
+        inventoryManageMapper.addInventoryReportManage("inventory_manage_allocation",inventoryManage);
     }
 
     @Override

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.frdscm.wms.mapper.InventoryManageRecordMapper">
+
+    <select id="getInventoryManageRecordByPageList" resultType="com.frdscm.wms.entity.InventoryManage">
+        select *
+        from ${tableName} im
+        <where>
+            im.status >= 0 and im.warehouse_id = #{inventoryManagePageDTO.warehouseId}
+            <if test="inventoryManagePageDTO.clientId != null">
+                and im.client_id = #{inventoryManagePageDTO.clientId}
+            </if>
+            <if test="inventoryManagePageDTO.receiptTimeStart != null and inventoryManagePageDTO.receiptTimeEnd !=null">
+                and im.create_time between #{inventoryManagePageDTO.receiptTimeStart} AND
+                DATE_ADD(#{inventoryManagePageDTO.receiptTimeEnd}, INTERVAL 1 DAY)
+            </if>
+            <if test="inventoryManagePageDTO.singleNumber != null">
+                and im.single_number = #{inventoryManagePageDTO.singleNumber}
+            </if>
+            <if test="inventoryManagePageDTO.keywords != null">
+                and im.material_number like '${inventoryManagePageDTO.keywords}%'
+            </if>
+        </where>
+        order by im.update_time desc
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <select id="getInventoryManageRecordByPageCount" resultType="java.lang.Integer">
+        select count(distinct im.id)
+        from ${tableName} im
+        <where>
+            im.status >= 0 and im.warehouse_id = #{inventoryManagePageDTO.warehouseId}
+            <if test="inventoryManagePageDTO.clientId != null">
+                and im.client_id = #{inventoryManagePageDTO.clientId}
+            </if>
+            <if test="inventoryManagePageDTO.receiptTimeStart != null and inventoryManagePageDTO.receiptTimeEnd !=null">
+                and im.create_time between #{inventoryManagePageDTO.receiptTimeStart} AND DATE_ADD(#{inventoryManagePageDTO.receiptTimeEnd}, INTERVAL 1 DAY)
+            </if>
+            <if test="inventoryManagePageDTO.singleNumber != null">
+                and im.single_number = #{inventoryManagePageDTO.singleNumber}
+            </if>
+            <if test="inventoryManagePageDTO.keywords != null">
+                and im.material_number like '${inventoryManagePageDTO.keywords}%'
+            </if>
+        </where>
+    </select>
+
+</mapper>

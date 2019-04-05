@@ -13,19 +13,19 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 库存管理(报表)表 服务类
+ * 移位、调拨记录表 服务类
  *
  * @author March_CD
  * @since 2018-07-07
  */
 public interface IInventoryManageReportService extends IService<InventoryManage> {
 
- /**
-  * 增加移位、调拨操作前记录
-  * @param receiptList
-  * @param receiptDemandPickUpDTO
-  * @param userBO
-  */
-  void  addInventoryReportManage(InventoryManage inventoryReportManage);
+   /**
+    * 查询移位或调拨列表
+    * @param page
+    * @param inventoryManagePageDTO
+    * @return
+    */
+   Page<InventoryManage> getInventoryManageRecordByPageList(Page<InventoryManage> page, InventoryManagePageDTO inventoryManagePageDTO,String tableName);
 
 }

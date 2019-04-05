@@ -30,7 +30,6 @@ public interface IInventoryManageService extends IService<InventoryManage> {
      */
     Page<InventoryManage> getInventoryManageByPageList(Page<InventoryManage> page, InventoryManagePageDTO inventoryManagePageDTO);
 
-
     /**
      * 修改库存状态
      * @param status 状态 0 - 不良品 1 - 良品

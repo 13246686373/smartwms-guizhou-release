@@ -27,7 +27,7 @@ public interface InventoryManageMapper extends BaseMapper<InventoryManage> {
      * 增加移位、调拨操作前记录
      * @param inventoryManage
      */
-    void addInventoryReportManage(InventoryManage inventoryManage);
+    void addInventoryReportManage(@Param("tableName") String tableName,@Param("inv") InventoryManage inventoryManage);
 
     /**
      * 查询库存

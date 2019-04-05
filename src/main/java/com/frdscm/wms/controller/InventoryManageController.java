@@ -56,6 +56,20 @@ public class InventoryManageController extends BaseController {
         return renderSuccess(inventoryManageService.getInventoryManageByPageList(page, inventoryManagePageDTO));
     }
 
+    @ApiOperation("移位记录列表")
+    @PostMapping("/displacement")
+    public Response Displacement(@RequestBody @Valid InventoryManagePageDTO inventoryManagePageDTO) {
+        Page<InventoryManage> page = new Page<>(inventoryManagePageDTO.getPageNo(), inventoryManagePageDTO.getPageSize());
+        return renderSuccess(inventoryManageService.getInventoryManageByPageList(page, inventoryManagePageDTO));
+    }
+
+    @ApiOperation("调拨记录列表")
+    @PostMapping("/allocation")
+    public Response allocation(@RequestBody @Valid InventoryManagePageDTO inventoryManagePageDTO) {
+        Page<InventoryManage> page = new Page<>(inventoryManagePageDTO.getPageNo(), inventoryManagePageDTO.getPageSize());
+        return renderSuccess(inventoryManageService.getInventoryManageByPageList(page, inventoryManagePageDTO));
+    }
+
     @ApiOperation("收货单号列表")
     @GetMapping("/singleNumberList/{warehouseId}")
     public Response singleNumberList(@PathVariable Integer warehouseId) {
