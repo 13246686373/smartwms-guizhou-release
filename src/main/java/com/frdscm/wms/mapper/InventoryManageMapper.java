@@ -6,8 +6,6 @@ import com.frdscm.wms.entity.InventoryManage;
 import com.frdscm.wms.entity.ShipmentCargoDetails;
 import com.frdscm.wms.entity.dto.*;
 import com.frdscm.wms.entity.vo.GetMaterialVO;
-import com.frdscm.wms.entity.vo.InventoryListVO;
-import io.swagger.models.auth.In;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
@@ -24,6 +22,12 @@ import java.util.Map;
  */
 @Repository
 public interface InventoryManageMapper extends BaseMapper<InventoryManage> {
+
+    /**
+     * 增加移位、调拨操作前记录
+     * @param inventoryManage
+     */
+    void addInventoryReportManage(InventoryManage inventoryManage);
 
     /**
      * 查询库存

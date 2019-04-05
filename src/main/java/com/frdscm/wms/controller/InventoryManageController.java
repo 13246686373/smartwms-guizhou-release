@@ -119,6 +119,7 @@ public class InventoryManageController extends BaseController {
     @ApiOperation("移库")
     @PostMapping("/moveWereHouseStorage")
     public Response moveWereHouseStorage(@RequestBody @Valid MoveWereHouseStorageDTO moveWereHouseStorageDTO) {
+        moveWereHouseStorageDTO.getId();
         inventoryManageService.moveWarehouseStorage(moveWereHouseStorageDTO);
         return renderSuccess("操作成功");
     }

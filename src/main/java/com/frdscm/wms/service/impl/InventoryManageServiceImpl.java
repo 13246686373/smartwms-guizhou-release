@@ -25,10 +25,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 库存管理表 服务实现类
@@ -232,6 +229,8 @@ public class InventoryManageServiceImpl extends ServiceImpl<InventoryManageMappe
         inventoryManage.setWarehouseStorageNumber(moveWereHouseStorageDTO.getWarehouseStorageNumber());
         inventoryManage.setAbnormal(1);
         inventoryManageMapper.updateById(inventoryManage);
+        inventoryManage.setCreateTime(new Date());
+        inventoryManageMapper.addInventoryReportManage(inventoryManage);
     }
 
     @Override
@@ -260,6 +259,9 @@ public class InventoryManageServiceImpl extends ServiceImpl<InventoryManageMappe
         inventoryManage.setWarehouseId(transferWereHouseStorageDTO.getWarehouseId());
         inventoryManage.setAbnormal(1);
         inventoryManageMapper.updateById(inventoryManage);
+        Date date = new Date();
+        inventoryManage.setCreateTime(date);
+        inventoryManageMapper.addInventoryReportManage(inventoryManage);
     }
 
     @Override
