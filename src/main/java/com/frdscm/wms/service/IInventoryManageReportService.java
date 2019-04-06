@@ -28,4 +28,27 @@ public interface IInventoryManageReportService extends IService<InventoryManage>
     */
    Page<InventoryManage> getInventoryManageRecordByPageList(Page<InventoryManage> page, InventoryManagePageDTO inventoryManagePageDTO,String tableName);
 
+   /**
+    * 查询库存报表
+    * @param page
+    * @param inventoryManagePageDTO
+    * @return
+    */
+   Page<InventoryManage> getInventoryListByPageList(Page<InventoryManage> page, InventoryManagePageDTO inventoryManagePageDTO);
+
+   /**
+    * 查询收货报表
+    * @param page
+    * @param receiptListPageDTO
+    * @return
+    */
+   Page<Map<String, Object>> getReceiptListByPageList(Page<Map<String, Object>> page, ReceiptReportFormDTO receiptReportFormDTO);
+
+   /**
+    * 查询出货报表
+    * @param page
+    * @param receiptReportFormDTO
+    * @return
+    */
+   Page<Map<String, Object>> getShipmentListByPageList(Page<Map<String, Object>> page, ReceiptReportFormDTO receiptReportFormDTO);
 }

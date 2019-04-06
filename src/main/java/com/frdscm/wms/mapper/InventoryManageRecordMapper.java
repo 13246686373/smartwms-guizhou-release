@@ -32,4 +32,38 @@ public interface InventoryManageRecordMapper extends BaseMapper<InventoryManage>
     List<InventoryManage> getInventoryManageRecordByPageList(@Param("offset") Integer offset, @Param("limit") Integer limit, @Param("inventoryManagePageDTO") InventoryManagePageDTO inventoryManagePageDTO,@Param("tableName") String tableName);
 
     int getInventoryManageRecordByPageCount(@Param("inventoryManagePageDTO") InventoryManagePageDTO inventoryManagePageDTO,@Param("tableName") String tableName);
+
+    /**
+     * 库存报表
+     * @param offset
+     * @param limit
+     * @param inventoryManagePageDTO
+     * @return
+     */
+    List<InventoryManage> getInventoryListByPageList(@Param("offset") Integer offset, @Param("limit") Integer limit, @Param("inventoryManagePageDTO") InventoryManagePageDTO inventoryManagePageDTO);
+
+    int getInventoryListByPageCount(@Param("inventoryManagePageDTO") InventoryManagePageDTO inventoryManagePageDTO);
+
+    /**
+     * 收货报表
+     * @param offset
+     * @param limit
+     * @param receiptReportFormDTO
+     * @return
+     */
+    List<Map<String, Object>> getReceiptListByPageList(@Param("offset") Integer offset, @Param("limit") Integer limit, @Param("receiptReportFormDTO") ReceiptReportFormDTO receiptReportFormDTO);
+
+    int getReceiptListByPageCount(@Param("receiptReportFormDTO") ReceiptReportFormDTO receiptReportFormDTO);
+
+    /**
+     * 出货报表
+     * @param offset
+     * @param limit
+     * @param receiptReportFormDTO
+     * @return
+     */
+    List<Map<String,Object>> getShipmentListByPageList(@Param("offset") Integer offset, @Param("limit") Integer limit, @Param("receiptReportFormDTO") ReceiptReportFormDTO receiptReportFormDTO);
+
+    int getShipmentListByPageCount(@Param("receiptReportFormDTO") ReceiptReportFormDTO receiptReportFormDTO);
+
 }

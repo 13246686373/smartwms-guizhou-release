@@ -27,14 +27,15 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.List;
+import java.util.Map;
 
 /**
- * 移位、调拨表 前端控制器
+ * 报表 前端控制器
  *
  * @author March_CD
  * @since 2018-07-07
  */
-@Api(tags = "移位、调拨管理接口")
+@Api(tags = "报表管理接口")
 @RestController
 @RequestMapping("/recordManage")
 public class InventoryManageRecordController extends BaseController {
@@ -60,5 +61,27 @@ public class InventoryManageRecordController extends BaseController {
         return renderSuccess(inventoryManageReportService.getInventoryManageRecordByPageList(page, inventoryManagePageDTO,"inventory_manage_allocation"));
     }
 
+
+    @ApiOperation("库存报表")
+    @PostMapping("/inventoryList")
+    public Response inventoryList(@RequestBody InventoryManagePageDTO inventoryManagePageDTO) {
+        Page<InventoryManage> page = new Page<>(inventoryManagePageDTO.getPageNo(), inventoryManagePageDTO.getPageSize());
+        return renderSuccess(inventoryManageReportService.getInventoryListByPageList(page, inventoryManagePageDTO));
+    }
+
+    @ApiOperation("收货报表")
+    @PostMapping("/receiptList")
+    public Response receiptList(@RequestBody ReceiptReportFormDTO receiptReportFormDTO) {
+        Page<Map<String,Object>> page = new Page<>(receiptReportFormDTO.getPageNo(), receiptReportFormDTO.getPageSize());
+        return renderSuccess(inventoryManageReportService.getReceiptListByPageList(page, receiptReportFormDTO));
+    }
+
+    @ApiOperation("出货报表")
+    @PostMapping("/shipmentList")
+    public Response shipmentList(@RequestBody ReceiptReportFormDTO receiptReportFormDTO) {
+        Page<Map<String,Object>> page = new Page<>(receiptReportFormDTO.getPageNo(), receiptReportFormDTO.getPageSize());
+        return renderSuccess(inventoryManageReportService.getShipmentListByPageList(page, receiptReportFormDTO));
+    }
 }
+
 

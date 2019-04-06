@@ -2,6 +2,61 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.frdscm.wms.mapper.InventoryManageRecordMapper">
 
+
+    <select id="getInventoryListByPageList" resultMap="com.frdscm.wms.mapper.InventoryManageMapper.BaseResultMap">
+        select im.*,
+        isl.id is_id,
+        isl.board_number is_board_number,
+        isl.box_num is_box_num,
+        isl.box_son_num is_box_son_num,
+        isl.box_serial_num is_box_serial_num,
+        isl.inventory_manage_id is_inventory_manage_id
+        from (select distinct im.*, w.name warehouse_name
+        from inventory_manage im
+        INNER JOIN warehouse w ON im.warehouse_id = w.id
+        <where>
+            im.status >= 0
+            <if test="null != inventoryManagePageDTO.warehouseId">
+                and im.warehouse_id = #{inventoryManagePageDTO.warehouseId}
+            </if>
+            <if test="inventoryManagePageDTO.clientId != null">
+                and im.client_id = #{inventoryManagePageDTO.clientId}
+            </if>
+            <if test="inventoryManagePageDTO.receiptTimeStart != null and inventoryManagePageDTO.receiptTimeEnd !=null">
+                and im.receipt_time between #{inventoryManagePageDTO.receiptTimeStart} AND
+                DATE_ADD(#{inventoryManagePageDTO.receiptTimeEnd}, INTERVAL 1 DAY)
+            </if>
+            <if test="inventoryManagePageDTO.keywords != null">
+                and im.material_number like '${inventoryManagePageDTO.keywords}%'
+            </if>
+        </where>
+        order by im.update_time desc
+        LIMIT #{offset}, #{limit}
+        ) im
+        LEFT JOIN inventory_scan_list isl on im.id = isl.inventory_manage_id
+    </select>
+
+    <select id="getInventoryListByPageCount" resultType="java.lang.Integer">
+        select count(distinct im.id)
+        from inventory_manage im
+        <where>
+            im.status >= 0
+            <if test="null != inventoryManagePageDTO.warehouseId">
+                and im.warehouse_id = #{inventoryManagePageDTO.warehouseId}
+            </if>
+            <if test="inventoryManagePageDTO.clientId != null">
+                and im.client_id = #{inventoryManagePageDTO.clientId}
+            </if>
+            <if test="inventoryManagePageDTO.receiptTimeStart != null and inventoryManagePageDTO.receiptTimeEnd !=null">
+                and im.receipt_time between #{inventoryManagePageDTO.receiptTimeStart} AND
+                DATE_ADD(#{inventoryManagePageDTO.receiptTimeEnd}, INTERVAL 1 DAY)
+            </if>
+            <if test="inventoryManagePageDTO.keywords != null">
+                and im.material_number like '${inventoryManagePageDTO.keywords}%'
+            </if>
+        </where>
+    </select>
+
     <select id="getInventoryManageRecordByPageList" resultType="com.frdscm.wms.entity.InventoryManage">
         select *
         from ${tableName} im
@@ -45,4 +100,189 @@
         </where>
     </select>
 
+    <!-- 收货列表 -->
+    <select id="getReceiptListByPageList" resultType="java.util.Map">
+        SELECT
+            rd.single_number singleNumber,
+            rd.client_id clientId,
+            rd.client_name clientName,
+            rm.id AS receiptManageId,
+            rd.warehouse_id warehouseId,
+            w.name,
+            rd.operating_mode_id operatingModeId,
+            rd.operating_mode_name operatingModeName,
+            rd.type_name,
+            rd.type_id,
+            rd.mode_name,
+            rm.status as receiptManageStatus,
+            rd.expected_time expectedTime,
+            rd.project_id projectId,rd.project_name projectName,
+            rl.material_number,
+            rl.material_name,
+            rl.unit,
+            rl.quantity_count,
+            rl.box_count,
+            rl.board_count,
+            rl.gross_weight,
+            rl.net_weight,
+            rl.volume,
+            rd.remark
+        FROM
+            receipt_manage rm
+        LEFT JOIN
+            receipt_demand rd ON rm.receipt_demand_id = rd.id
+        LEFT JOIN
+            warehouse w ON rd.warehouse_id = w.id
+        LEFT JOIN
+            receipt_list rl on rl.receipt_manage_id = rm.id
+        <where>
+            rd.`status` = 2
+            <if test="receiptReportFormDTO.clientId != null">
+                and rd.client_id = #{receiptReportFormDTO.clientId}
+            </if>
+            <if test="receiptReportFormDTO.warehouseFilters != null">
+                and rd.warehouse_id = #{receiptReportFormDTO.warehouseFilters}
+            </if>
+            <if test="receiptReportFormDTO.warehousingTimeStart != null and receiptReportFormDTO.warehousingTimeEnd !=null">
+                and rd.expected_time between #{receiptReportFormDTO.warehousingTimeStart} AND DATE_ADD(#{receiptReportFormDTO.warehousingTimeEnd}, INTERVAL 1 DAY)
+            </if>
+            <if test="receiptReportFormDTO.modeId != null">
+                and rd.type_id = #{receiptReportFormDTO.modeId}
+            </if>
+            <if test="receiptReportFormDTO.singleNumber != null">
+                and rd.single_number = #{receiptReportFormDTO.singleNumber}
+            </if>
+            <if test="receiptReportFormDTO.materialNumber">
+                and rl.material_number = #{receiptReportFormDTO.materialNumber}
+            </if>
+        </where>
+        order by rd.update_time DESC
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <!-- 收货列表总数 -->
+    <select id="getReceiptListByPageCount" resultType="java.lang.Integer">
+        SELECT
+            count(rd.single_number)
+        FROM
+            receipt_manage rm
+        LEFT JOIN
+            receipt_demand rd ON rm.receipt_demand_id = rd.id
+        LEFT JOIN
+            warehouse w ON rd.warehouse_id = w.id
+        LEFT JOIN
+            receipt_list rl on rl.receipt_manage_id = rm.id
+        <where>
+            rd.`status` = 2
+            <if test="receiptReportFormDTO.clientId != null">
+                and rd.client_id = #{receiptReportFormDTO.clientId}
+            </if>
+            <if test="receiptReportFormDTO.warehouseFilters != null">
+                and rd.warehouse_id = #{receiptReportFormDTO.warehouseFilters}
+            </if>
+            <if test="receiptReportFormDTO.warehousingTimeStart != null and receiptReportFormDTO.warehousingTimeEnd !=null">
+                and rd.expected_time between #{receiptReportFormDTO.warehousingTimeStart} AND DATE_ADD(#{receiptReportFormDTO.warehousingTimeEnd}, INTERVAL 1 DAY)
+            </if>
+            <if test="receiptReportFormDTO.modeId != null">
+                and rd.type_id = #{receiptReportFormDTO.modeId}
+            </if>
+            <if test="receiptReportFormDTO.singleNumber != null">
+                and rd.single_number = #{receiptReportFormDTO.singleNumber}
+            </if>
+            <if test="receiptReportFormDTO.materialNumber">
+                and rl.material_number = #{receiptReportFormDTO.materialNumber}
+            </if>
+        </where>
+    </select>
+
+    <!-- 出货列表总数 -->
+    <select id="getShipmentListByPageCount" resultType="java.lang.Integer">
+        SELECT
+            count(sd.single_number)
+        FROM
+            shipment_manage sm
+        left join
+            shipment_demand sd on sm.shipment_demand_id = sd.id
+        left join
+            warehouse w on sd.warehouse_id = w.id
+        left join
+            shipment_list sl on sl.shipment_manage_id = sm.id
+        <where>
+            sd.`status` = 2
+            <if test="receiptReportFormDTO.clientId != null">
+                and sd.client_id = #{receiptReportFormDTO.clientId}
+            </if>
+            <if test="receiptReportFormDTO.warehouseFilters != null">
+                and sd.warehouse_id = #{receiptReportFormDTO.warehouseFilters}
+            </if>
+            <if test="receiptReportFormDTO.warehousingTimeStart != null and receiptReportFormDTO.warehousingTimeEnd !=null">
+                and sd.delivery_time between #{receiptReportFormDTO.warehousingTimeStart} AND DATE_ADD(#{receiptReportFormDTO.warehousingTimeEnd}, INTERVAL 1 DAY)
+            </if>
+            <if test="receiptReportFormDTO.modeId != null">
+                and sd.type_id = #{receiptReportFormDTO.modeId}
+            </if>
+            <if test="receiptReportFormDTO.singleNumber != null">
+                and sd.single_number = #{receiptReportFormDTO.singleNumber}
+            </if>
+            <if test="receiptReportFormDTO.materialNumber">
+                and sl.material_number = #{receiptReportFormDTO.materialNumber}
+            </if>
+        </where>
+    </select>
+
+    <!-- 出货列表 -->
+    <select id="getShipmentListByPageList" resultType="java.util.Map">
+        SELECT
+        sd.single_number,
+        sd.warehouse_name,
+        sd.client_name,
+        sd.delivery_time,
+        sd.type_name,
+        sd.shipment_method_name,
+        sd.source_number,
+        sl.material_number,
+        sl.material_name,
+        sl.unit,
+        sl.quantity_count,
+        sl.box_count,
+        sl.board_count,
+        sl.gross_weight,
+        sl.net_weight,
+        sl.volume,
+        sd.cargo_party_id,
+        sd.cargo_party_name,
+        sd.receipt_address,
+        sd.remark
+        FROM
+        shipment_manage sm
+        left join
+        shipment_demand sd on sm.shipment_demand_id = sd.id
+        left join
+        warehouse w on sd.warehouse_id = w.id
+        left join
+        shipment_list sl on sl.shipment_manage_id = sm.id
+        <where>
+            sd.`status` = 2
+            <if test="receiptReportFormDTO.clientId != null">
+                and sd.client_id = #{receiptReportFormDTO.clientId}
+            </if>
+            <if test="receiptReportFormDTO.warehouseFilters != null">
+                and sd.warehouse_id = #{receiptReportFormDTO.warehouseFilters}
+            </if>
+            <if test="receiptReportFormDTO.warehousingTimeStart != null and receiptReportFormDTO.warehousingTimeEnd !=null">
+                and sd.delivery_time between #{receiptReportFormDTO.warehousingTimeStart} AND DATE_ADD(#{receiptReportFormDTO.warehousingTimeEnd}, INTERVAL 1 DAY)
+            </if>
+            <if test="receiptReportFormDTO.modeId != null">
+                and sd.type_id = #{receiptReportFormDTO.modeId}
+            </if>
+            <if test="receiptReportFormDTO.singleNumber != null">
+                and sd.single_number = #{receiptReportFormDTO.singleNumber}
+            </if>
+            <if test="receiptReportFormDTO.materialNumber">
+                and sl.material_number = #{receiptReportFormDTO.materialNumber}
+            </if>
+        </where>
+        order by sd.update_time DESC
+        LIMIT #{offset}, #{limit}
+    </select>
 </mapper>
