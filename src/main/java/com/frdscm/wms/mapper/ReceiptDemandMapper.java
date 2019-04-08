@@ -8,6 +8,7 @@ import com.frdscm.wms.entity.dto.InventoryManagePageDTO;
 import com.frdscm.wms.entity.dto.ReceiptDemandPageDTO;
 import com.frdscm.wms.entity.vo.ReceiptDemandAppVO;
 import com.frdscm.wms.entity.vo.ReceiptDemandVO;
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
@@ -71,4 +72,11 @@ public interface ReceiptDemandMapper extends BaseMapper<ReceiptDemand> {
 
     @Select("select ifnull(max(right(single_number, 3)),0) + 1 from receipt_demand where single_number like concat(#{singleNumber},'%')")
     int countSingleNumber(@Param("singleNumber") String singleNumber);
+
+    /**
+     * 根据订单号删除收货需求
+     * @param orderNo
+     */
+    @Delete("delete from receipt_demand where order_number = '${orderNo}'")
+    void deleteByOrderNo(@Param("orderNo") String orderNo);
 }

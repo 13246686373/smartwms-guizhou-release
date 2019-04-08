@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.frdscm.wms.mapper.CargoDetailsMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.frdscm.wms.entity.CargoDetails">
+        <id column="id" property="id" />
+        <result column="order_id" property="orderId" />
+        <result column="order_no" property="orderNo" />
+        <result column="materials_name" property="materialsName" />
+        <result column="specification_grade" property="specificationGrade" />
+        <result column="batch_no" property="batchNo" />
+        <result column="unit_id" property="unitId" />
+        <result column="unit" property="unit" />
+        <result column="quantity" property="quantity" />
+        <result column="volume" property="volume" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, order_id, order_no, materials_name, specification_grade, batch_no, unit_id, unit, quantity, volume, create_time, update_time
+    </sql>
+
+</mapper>

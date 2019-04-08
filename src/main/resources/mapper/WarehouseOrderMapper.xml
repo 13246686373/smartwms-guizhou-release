@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.frdscm.wms.mapper.WarehouseOrderMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.frdscm.wms.entity.WarehouseOrder">
+        <id column="id" property="id" />
+        <result column="order_no" property="orderNo" />
+        <result column="client_id" property="clientId" />
+        <result column="client_name" property="clientName" />
+        <result column="contract_no" property="contractNo" />
+        <result column="contact_start_time" property="contactStartTime" />
+        <result column="contact_end_time" property="contactEndTime" />
+        <result column="warehouse_id" property="warehouseId" />
+        <result column="receiving_warehouse" property="receivingWarehouse" />
+        <result column="rojected_to_warehouse_time" property="rojectedToWarehouseTime" />
+        <result column="address_of_contract_annex" property="addressOfContractAnnex" />
+        <result column="remark" property="remark" />
+        <result column="operator_id" property="operatorId" />
+        <result column="operator_name" property="operatorName" />
+        <result column="enabled_flag" property="enabledFlag" />
+        <result column="order_type" property="orderType" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, order_no, client_id, client_name, contract_no, contact_start_time, contact_end_time, warehouse_id, receiving_warehouse,
+        rojected_to_warehouse_time, address_of_contract_annex, remark, operator_id, operator_name, enabled_flag, order_type, create_time, update_time
+    </sql>
+
+    <select id="selectByPageList" resultType="com.frdscm.wms.entity.vo.WarehouseOrderVO">
+        SELECT <include refid="Base_Column_List"/> FROM warehouse_order
+        <where>
+            enabled_flag = 'Y'
+            <if test="orderNo != null and orderNo != ''">
+                and order_no like '${orderNo}%'
+            </if>
+            <if test="clientName != null and clientName != ''">
+                and client_name like '${clientName}%'
+            </if>
+            <if test="contractNo != null and contractNo != ''">
+                and contract_no = #{contractNo}
+            </if>
+            <if test="createTime != null and createTime != ''">
+                and create_time = #{createTime, jdbcType=Date}
+            </if>
+            <if test="orderType != null">
+                and order_type = #{orderType}
+            </if>
+        </where>
+        GROUP BY id
+        ORDER BY update_time ASC
+    </select>
+
+</mapper>
